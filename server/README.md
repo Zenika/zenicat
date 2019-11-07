@@ -14,6 +14,6 @@ You can find `yourSecret`, `yourBotUserToken`, `yourToken`, `yourChannel` and `y
 
 # Run server
 
-Run `yarn run dev` to start project.
+Run `yarn run start` to start project.
 
 It's going to start on `localhost:3000`
