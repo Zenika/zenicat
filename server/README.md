@@ -10,7 +10,7 @@ CHANNEL=yourChannel
 BOT_ID=yourBotId
 ```
 
-You can find `yourSecret`, `yourBotUserToken`, `yourToken`, `yourChannel` and `yourBotId` on slack website.
+You can find `yourSecret`, `yourBotUserToken`, `yourToken`, `yourChannel` and `yourBotId` on slack[api.slack.com] website.
 
 # Run server
 
