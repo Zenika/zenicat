@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ."
+    "start": "node .",
+    "prettier": "prettier .circleci/config.yml  *.{js,json} tests/{**/,}*.{js,json}",
+    "format:check": "npm run prettier -- --list-different",
+    "format:fix": "npm run prettier -- --write"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +17,7 @@
     "@slack/web-api": "^5.1.0",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
+    "prettier": "^1.18.2",
     "socket.io": "^2.3.0",
     "uuid": "^3.3.3"
   }
