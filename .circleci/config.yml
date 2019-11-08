@@ -138,4 +138,6 @@ workflows:
           context: Zenika
           filters:
             branches:
-              only: master
+              ignore: /.*/
+            tags:
+              only: /v.+/
