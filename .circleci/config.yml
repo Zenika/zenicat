@@ -104,6 +104,15 @@ jobs:
       - checkout
       - attach_workspace:
           at: ./
+      - run:
+          command: |
+            cp -r ~/project/deploy .
+            git config --global user.email "dsi-ext@zenika.com"
+            git config --global user.name "Zenika"
+            git init
+            git add .
+            git commit -m "deploy!"
+          working_directory: ~/deploy
       - run: sudo npm install --global clever-tools
       - run:
           command: clever login --token=$CLEVER_TOKEN --secret=$CLEVER_SECRET
