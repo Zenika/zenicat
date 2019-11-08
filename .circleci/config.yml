@@ -1,0 +1,163 @@
+version: 2.1
+
+jobs:
+  install-dependencies-front:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-front-{{ checksum "front/yarn.lock" }}
+            - dependencies-front-
+      - run:
+          name: Download UI dependencies
+          working_directory: front
+          command: yarn
+      - save_cache:
+          paths:
+            - ./front/node_modules
+          key: dependencies-front-{{ checksum "front/yarn.lock" }}
+  install-dependencies-back:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-back-{{ checksum "server/yarn.lock" }}
+            - dependencies-back-
+      - run:
+          name: Download UI dependencies
+          working_directory: server
+          command: yarn
+      - save_cache:
+          paths:
+            - ./server/node_modules
+          key: dependencies-back-{{ checksum "server/yarn.lock" }}
+  check-format-front:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-front-{{ checksum "front/yarn.lock" }}
+            - dependencies-front-
+      - run:
+          name: Check formatting
+          working_directory: front
+          command: npm run format:check
+  check-format-back:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-back-{{ checksum "server/yarn.lock" }}
+            - dependencies-back-
+      - run:
+          name: Check formatting
+          working_directory: server
+          command: npm run format:check
+  build-front:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-front-{{ checksum "front/yarn.lock" }}
+            - dependencies-front-
+      - run:
+          name: Build
+          working_directory: front
+          command: yarn build
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - front/build
+  package:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - restore_cache:
+          keys:
+            - dependencies-back-{{ checksum "server/yarn.lock" }}
+            - dependencies-back-
+      - run:
+          name: Create deploy directory and copy server
+          command: mkdir deploy && cp -r server/* deploy && cp -r front/build deploy
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - deploy
+  app-deploy:
+    docker:
+      - image: circleci/node:12
+    parameters:
+      clever-app-id:
+        type: string
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          command: |
+            cp -r ~/project/deploy/* .
+            ls
+            git config --global user.email "dsi-ext@zenika.com"
+            git config --global user.name "Zenika"
+            git init
+            git add .
+            git commit -m "deploy!"
+          working_directory: ~/deploy
+      - run: sudo npm install --global clever-tools
+      - run:
+          command: clever login --token=$CLEVER_TOKEN --secret=$CLEVER_SECRET
+          working_directory: ~/deploy
+      - run:
+          command: clever link << parameters.clever-app-id >>
+          working_directory: ~/deploy
+      - run:
+          command: clever deploy --force
+          working_directory: ~/deploy
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - install-dependencies-front
+      - check-format-front:
+          requires:
+            - install-dependencies-front
+      - install-dependencies-back
+      - check-format-back:
+          requires:
+            - install-dependencies-back
+      - build-front:
+          requires:
+            - check-format-front
+      - package:
+          requires:
+            - build-front
+            - check-format-back
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v.+/
+      - app-deploy:
+          clever-app-id: app_aca0174d-686d-40fb-bdba-7f2978c66797
+          requires:
+            - package
+          context: clever-cloud-zenika
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v.+/

@@ -19,6 +19,8 @@ const socket = io(server);
 
 let clients = {};
 
+app.use(express.static('build'));
+
 app.use("/slack/events", slackEvents.expressMiddleware());
 
 app.get("/question", async function(req, res) {
