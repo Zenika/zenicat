@@ -59,7 +59,7 @@ jobs:
             - dependencies-back-
       - run:
           name: Check formatting
-          working_directory: back
+          working_directory: server
           command: npm run format:check
   build-front:
     docker:
@@ -97,7 +97,7 @@ jobs:
             - deploy
   app-deploy:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps:
       - checkout
       - run:
@@ -123,6 +123,11 @@ workflows:
           requires:
             - build-front
             - check-format-back
+          # filters:
+          #   branches:
+          #     ignore: /.*/
+          #   tags:
+          #     only: /v.+/
       - app-deploy:
           requires:
             - package
