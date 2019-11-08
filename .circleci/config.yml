@@ -4,20 +4,20 @@ jobs:
   install-dependencies-front:
     docker:
       - image: circleci/node:12
-    working_directory: front
     steps:
       - checkout
       - restore_cache:
           keys:
-            - dependencies-front-{{ checksum "yarn.lock" }}
+            - dependencies-front-{{ checksum "front/yarn.lock" }}
             - dependencies-front-
       - run:
           name: Download UI dependencies
+          working_directory: front
           command: yarn
       - save_cache:
           paths:
-            - ./node_modules
-          key: dependencies-front-{{ checksum "yarn.lock" }}
+            - ./front/node_modules
+          key: dependencies-front-{{ checksum "front/yarn.lock" }}
   install-dependencies-back:
     docker:
       - image: circleci/node:12
@@ -26,58 +26,59 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - dependencies-back-{{ checksum "yarn.lock" }}
+            - dependencies-back-{{ checksum "server/yarn.lock" }}
             - dependencies-back-
       - run:
           name: Download UI dependencies
+          working_directory: back
           command: yarn
       - save_cache:
           paths:
-            - ./node_modules
-          key: dependencies-back-{{ checksum "yarn.lock" }}
+            - ./server/node_modules
+          key: dependencies-back-{{ checksum "server/yarn.lock" }}
   check-format-front:
     docker:
       - image: circleci/node:12
-    working_directory: front
     steps:
       - checkout
       - restore_cache:
           keys:
-            - dependencies-front-{{ checksum "yarn.lock" }}
+            - dependencies-front-{{ checksum "front/yarn.lock" }}
             - dependencies-front-
       - run:
           name: Check formatting
+          working_directory: front
           command: npm run format:check
   check-format-back:
     docker:
       - image: circleci/node:12
-    working_directory: back
     steps:
       - checkout
       - restore_cache:
           keys:
-            - dependencies-back-{{ checksum "yarn.lock" }}
+            - dependencies-back-{{ checksum "server/yarn.lock" }}
             - dependencies-back-
       - run:
           name: Check formatting
+          working_directory: back
           command: npm run format:check
   build-front:
     docker:
       - image: circleci/node:12
-    working_directory: front
     steps:
       - checkout
       - restore_cache:
           keys:
-            - dependencies-front-{{ checksum "yarn.lock" }}
+            - dependencies-front-{{ checksum "front/yarn.lock" }}
             - dependencies-front-
       - run:
           name: Build
+          working_directory: front
           command: yarn build
       - persist_to_workspace:
           root: ./
           paths:
-            - build
+            - front/build
   package:
     docker:
       - image: circleci/node:12
