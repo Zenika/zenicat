@@ -146,11 +146,11 @@ workflows:
           requires:
             - build-front
             - check-format-back
-          # filters:
-          #   branches:
-          #     ignore: /.*/
-          #   tags:
-          #     only: /v.+/
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v.+/
       - app-deploy:
           clever-app-id: app_aca0174d-686d-40fb-bdba-7f2978c66797
           requires:
@@ -158,9 +158,6 @@ workflows:
           context: clever-cloud-zenika
           filters:
             branches:
-              only: /.*/
-          # filters:
-          #   branches:
-          #     ignore: /.*/
-          #   tags:
-          #     only: /v.+/
+              ignore: /.*/
+            tags:
+              only: /v.+/
