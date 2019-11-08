@@ -119,13 +119,13 @@ jobs:
       - run: sudo npm install --global clever-tools
       - run:
           command: clever login --token=$CLEVER_TOKEN --secret=$CLEVER_SECRET
-          working_directory: deploy
+          working_directory: ~/deploy
       - run:
           command: clever link << parameters.clever-app-id >>
-          working_directory: deploy
+          working_directory: ~/deploy
       - run:
           command: clever deploy --force
-          working_directory: deploy
+          working_directory: ~/deploy
 
 workflows:
   version: 2
