@@ -89,7 +89,7 @@ jobs:
             - dependencies-back-
       - run:
           name: Create deploy directory and copy server
-          command: mkdir deploy && cp -r server/* deploy && ls
+          command: mkdir deploy && cp -r server/* deploy && cd deploy && ls
       - persist_to_workspace:
           root: ./
           paths:
@@ -107,6 +107,7 @@ jobs:
       - run:
           command: |
             cp -r ~/project/deploy .
+            ls
             git config --global user.email "dsi-ext@zenika.com"
             git config --global user.name "Zenika"
             git init
