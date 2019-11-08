@@ -101,11 +101,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Captain Rover CLI
-          command: sudo npm install -g caprover
-      - deploy:
-          name: Deploy app to Captain Rover
-          command: caprover deploy -h $DOMAIN -p $PASSWORD -b master -a $APPNAME
+          name: Nothing for now
+          command: echo "Nothing for now"
 
 workflows:
   version: 2
@@ -128,7 +125,7 @@ workflows:
             - check-format-back
       - app-deploy:
           requires:
-            - build
+            - package
           context: Zenika
           filters:
             branches:
