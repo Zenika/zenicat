@@ -81,7 +81,6 @@ jobs:
   package:
     docker:
       - image: circleci/node:12
-    working_directory: deploy
     steps:
       - checkout
       - restore_cache:
@@ -89,8 +88,8 @@ jobs:
             - dependencies-back-{{ checksum "server/yarn.lock" }}
             - dependencies-back-
       - run:
-          name: Copy server
-          command: cp server/* deploy
+          name: Create deploy directory and copy server
+          command: mkdir deploy && cp server/* deploy
       - persist_to_workspace:
           root: ./
           paths:
@@ -98,6 +97,9 @@ jobs:
   app-deploy:
     docker:
       - image: circleci/node:12
+    parameters:
+      clever-app-id:
+        type: string
     steps:
       - checkout
       - run:
@@ -129,6 +131,7 @@ workflows:
           #   tags:
           #     only: /v.+/
       - app-deploy:
+          clever-app-id: app_aca0174d-686d-40fb-bdba-7f2978c66797
           requires:
             - package
           context: Zenika
