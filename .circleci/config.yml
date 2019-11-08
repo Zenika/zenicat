@@ -1,0 +1,141 @@
+version: 2.1
+
+jobs:
+  install-dependencies-front:
+    docker:
+      - image: circleci/node:12
+    working_directory: 
+      - front
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-front-{{ checksum "yarn.lock" }}
+            - dependencies-front-
+      - run:
+          name: Download UI dependencies
+          command: yarn
+      - save_cache:
+          paths:
+            - ./node_modules
+          key: dependencies-front-{{ checksum "yarn.lock" }}
+  install-dependencies-back:
+    docker:
+      - image: circleci/node:12
+    working_directory: 
+      - server
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-back-{{ checksum "yarn.lock" }}
+            - dependencies-back-
+      - run:
+          name: Download UI dependencies
+          command: yarn
+      - save_cache:
+          paths:
+            - ./node_modules
+          key: dependencies-back-{{ checksum "yarn.lock" }}
+  check-format-front:
+    docker:
+      - image: circleci/node:12
+    working_directory: 
+      - front
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-front-{{ checksum "yarn.lock" }}
+            - dependencies-front-
+      - run:
+          name: Check formatting
+          command: npm run format:check
+  check-format-back:
+    docker:
+      - image: circleci/node:12
+    working_directory: 
+      - back
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-back-{{ checksum "yarn.lock" }}
+            - dependencies-back-
+      - run:
+          name: Check formatting
+          command: npm run format:check
+  build-front:
+    docker:
+      - image: circleci/node:12
+    working_directory: 
+      - front
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-front-{{ checksum "yarn.lock" }}
+            - dependencies-front-
+      - run:
+          name: Build
+          command: yarn build
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - build
+  package:
+    docker:
+      - image: circleci/node:12
+    working_directory: 
+      - deploy
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-back-{{ checksum "server/yarn.lock" }}
+            - dependencies-back-
+      - run:
+          name: Copy server
+          command: cp server/* deploy
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - deploy
+  app-deploy:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run:
+          name: Install Captain Rover CLI
+          command: sudo npm install -g caprover
+      - deploy:
+          name: Deploy app to Captain Rover
+          command: caprover deploy -h $DOMAIN -p $PASSWORD -b master -a $APPNAME
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - install-dependencies-front
+      - check-format-front:
+          requires:
+            - install-dependencies-front
+      - install-dependencies-back
+      - check-format-back:
+          requires:
+            - install-dependencies-back
+      - build-front:
+          requires:
+            - check-format-front
+      - package:
+          requires:
+            - build-front
+            - check-format-back
+      - app-deploy:
+          requires:
+            - build
+          context: Zenika
+          filters:
+            branches:
+              only: master
