@@ -102,9 +102,18 @@ jobs:
         type: string
     steps:
       - checkout
+      - attach_workspace:
+          at: ./
+      - run: sudo npm install --global clever-tools
       - run:
-          name: Nothing for now
-          command: echo "Nothing for now"
+          command: clever login --token=$CLEVER_TOKEN --secret=$CLEVER_SECRET
+          working_directory: deploy
+      - run:
+          command: clever link << parameters.clever-app-id >>
+          working_directory: deploy
+      - run:
+          command: clever deploy --force
+          working_directory: deploy
 
 workflows:
   version: 2
@@ -134,9 +143,12 @@ workflows:
           clever-app-id: app_aca0174d-686d-40fb-bdba-7f2978c66797
           requires:
             - package
-          context: Zenika
+          context: clever-cloud-zenika
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /v.+/
+              only: /.*/
+          # filters:
+          #   branches:
+          #     ignore: /.*/
+          #   tags:
+          #     only: /v.+/
