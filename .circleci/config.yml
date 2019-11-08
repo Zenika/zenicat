@@ -83,6 +83,8 @@ jobs:
       - image: circleci/node:12
     steps:
       - checkout
+      - attach_workspace:
+          at: ./
       - restore_cache:
           keys:
             - dependencies-back-{{ checksum "server/yarn.lock" }}
