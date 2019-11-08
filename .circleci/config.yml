@@ -89,7 +89,7 @@ jobs:
             - dependencies-back-
       - run:
           name: Create deploy directory and copy server
-          command: mkdir deploy && cp server/* deploy
+          command: mkdir deploy && cp -r server/* deploy
       - persist_to_workspace:
           root: ./
           paths:
