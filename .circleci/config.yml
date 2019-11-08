@@ -4,8 +4,7 @@ jobs:
   install-dependencies-front:
     docker:
       - image: circleci/node:12
-    working_directory: 
-      - front
+    working_directory: front
     steps:
       - checkout
       - restore_cache:
@@ -22,8 +21,7 @@ jobs:
   install-dependencies-back:
     docker:
       - image: circleci/node:12
-    working_directory: 
-      - server
+    working_directory: server
     steps:
       - checkout
       - restore_cache:
@@ -40,8 +38,7 @@ jobs:
   check-format-front:
     docker:
       - image: circleci/node:12
-    working_directory: 
-      - front
+    working_directory: front
     steps:
       - checkout
       - restore_cache:
@@ -54,8 +51,7 @@ jobs:
   check-format-back:
     docker:
       - image: circleci/node:12
-    working_directory: 
-      - back
+    working_directory: back
     steps:
       - checkout
       - restore_cache:
@@ -68,8 +64,7 @@ jobs:
   build-front:
     docker:
       - image: circleci/node:12
-    working_directory: 
-      - front
+    working_directory: front
     steps:
       - checkout
       - restore_cache:
@@ -86,8 +81,7 @@ jobs:
   package:
     docker:
       - image: circleci/node:12
-    working_directory: 
-      - deploy
+    working_directory: deploy
     steps:
       - checkout
       - restore_cache:
